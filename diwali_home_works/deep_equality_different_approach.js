@@ -15,12 +15,23 @@ function areArraysEqual(a, b) {
   return true;
 }
 
+function areObjectsEqual(a, b) {
+  if (Object.keys(a).length !== Object.keys(b).length) return false;
+  for (const key in a) {
+    if (!(key in b)) return false;
+    return isEqual(a[key], b[key]);
+  }
+  return true;
+}
+
 function isEqual(a, b) {
   if (a === b) return true;
   if (!areTypeEqual(a, b)) return false;
   switch (getType(a)) {
     case "array":
       return areArraysEqual(a, b);
+    case "object":
+      return areObjectsEqual(a, b);
   }
   return false;
 }
@@ -31,28 +42,17 @@ function test(message, expected, a, b) {
   console.log(`${symbol} ${message}`);
 }
 
-function testBooleans(params) {
+function testBooleans() {
   test("Two same boolean should be equal", true, true, true);
   test("Two different boolean should be unequal", false, false, true);
   test("One boolean and one number should be unequal", false, true, 1);
 }
 
-function main() {
-  testBooleans();
-  testNumber();
-  testString();
-  testArray();
-}
-
-main();
-
-function testArray() {
-  test("Two empty array should be equal", true, [], []);
-  test("Two same array should be equal", true, [5], [5]);
-  test("Two array with same length but different value should be equal", false, [2], [5]);
-  test("Two same nested empty array should be equal", true, [[]], [[]]);
-  test("Two same nested array should be equal", true, [[1]], [[1]]);
-  test("Two diffrent nested array should be equal", false, [[1]], [[5]]);
+function testNumber() {
+  test("Two same numeber should be equal", true, 5, 5);
+  test("Two same negetive numeber should be equal", true, -5, -5);
+  test("One negetive and one positive number", false, -5, 5);
+  test("Two different number should be unequal", false, 4, 1);
 }
 
 function testString() {
@@ -60,7 +60,31 @@ function testString() {
   test("Two different string should be unequal", false, "Hello", "world");
 }
 
-function testNumber() {
-  test("Two same numeber should be equal", true, 5, 5);
-  test("Two different number should be unequal", false, 4, 1);
+function testArray() {
+  test("Two empty array should be equal", true, [], []);
+  test("Two same array should be equal", true, [5], [5]);
+  test("One empty array and one non empty array", false, [], [5]);
+  test("Two array with same length but different value should be equal", false, [2], [5]);
+  test("Two same nested empty array should be equal", true, [[]], [[]]);
+  test("Two same nested array should be equal", true, [[1]], [[1]]);
+  test("Two diffrent nested array should be equal", false, [[1]], [[5]]);
 }
+
+function testObejct() {
+  test("Two empty object should be equal", true, {}, {});
+  test("One object and one empty object should be unequal", false, { a: 1 }, {});
+  test("One object and one empty object should be unequal", false, { a: 1 }, {});
+  test("Two object with different key should be unequal", false, { a: 1 }, { b: 1 });
+  test("Two same object with different value should be unequal", false, { a: 1 }, { a: 2 });
+  test("Two same nested object should be equal", true, { a: { b: 1 } }, { a: { b: 1 } });
+}
+
+function main() {
+  testBooleans();
+  testNumber();
+  testString();
+  testArray();
+  testObejct();
+}
+
+main();
